@@ -29,7 +29,6 @@ function HomePage() {
             limit: 10
           }
         });
-        console.log(response.data); // Log the response data
         setProducts(response.data.products);
         setFilteredProducts(response.data.products);
         setTotalPages(response.data.totalPages);
