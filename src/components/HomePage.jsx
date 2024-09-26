@@ -3,9 +3,9 @@ import SearchBar from './SearchBar';
 import CategoryFilter from './CategoryFilter';
 import Product from './Product';
 import ProductModal from './ProductModal';
-import Spinner from './Spinner'; // Import spinner
-import axios from 'axios';
+import Spinner from './Spinner';
 import '../styles/HomePage.css';
+import axios from 'axios';
 
 function HomePage() {
   const [products, setProducts] = useState([]);
@@ -13,34 +13,36 @@ function HomePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);  // For handling pagination
-  const [loading, setLoading] = useState(false);  // Add loading state for pagination
-  const [selectedProduct, setSelectedProduct] = useState(null);  // Change this to hold the selected product data
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); // State to handle errors
+  const [selectedProduct, setSelectedProduct] = useState(null); // Store the selected product object
 
-  // Fetch products with pagination
   useEffect(() => {
     const fetchProducts = async () => {
-      setLoading(true); // Start loading
+      setLoading(true);
+      setError(null); // Reset error state
       try {
         const response = await axios.get('https://eccom-backend.onrender.com/products', {
           params: {
             page: currentPage,
-            limit: 10  // Adjust the limit based on your requirement
+            limit: 10
           }
         });
+        console.log(response.data); // Log the response data
         setProducts(response.data.products);
-        setFilteredProducts(response.data.products);  // Initially show all products
-        setTotalPages(response.data.totalPages);  // Update the total number of pages
+        setFilteredProducts(response.data.products);
+        setTotalPages(response.data.totalPages);
       } catch (error) {
         console.error('Error fetching products:', error);
+        setError('Failed to load products. Please try again later.'); // Set error message
       }
-      setLoading(false); // End loading
+      setLoading(false);
     };
 
     fetchProducts();
-  }, [currentPage]);  // Refetch products when page changes
+  }, [currentPage]);
 
-  // Handle product search and category filter
   useEffect(() => {
     let updatedProducts = [...products];
 
@@ -73,7 +75,9 @@ function HomePage() {
       <CategoryFilter selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
 
       {loading ? ( 
-        <Spinner />  // Show spinner while loading products
+        <Spinner /> 
+      ) : error ? (
+        <div className="error">{error}</div> // Show error message if there is an error
       ) : (
         <Product products={filteredProducts} onProductClick={handleProductClick} />
       )}

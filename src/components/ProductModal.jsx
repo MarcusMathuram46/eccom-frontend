@@ -1,7 +1,9 @@
 import React from "react";
 import "../styles/ProductModal.css";
+import Spinner from "./Spinner";
 
 function ProductModal({ product, onClose }) {
+  // Check if the product prop is provided
   if (!product) return null;
 
   return (
@@ -10,12 +12,7 @@ function ProductModal({ product, onClose }) {
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">{product.title}</h5>
-            <button
-              type="button"
-              className="close"
-              onClick={onClose}
-              aria-label="Close"
-            >
+            <button type="button" className="close" onClick={onClose} aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -27,12 +24,10 @@ function ProductModal({ product, onClose }) {
               loading="lazy"
             />
             <p>{product.description}</p>
-            <p>
-              <strong>Price:</strong> ${product.price}
-            </p>
-            <p>
-              <strong>Available Quantity:</strong> {product.quantity}
-            </p>
+            <p><strong>Price:</strong> ${product.price}</p>
+            <p><strong>Available Quantity:</strong> {product.quantity}</p>
+            <p><strong>Category:</strong> {product.category}</p>
+            {/* Add more details as necessary */}
           </div>
         </div>
       </div>
