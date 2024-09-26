@@ -18,45 +18,52 @@ function HomePage() {
   const [error, setError] = useState(null); // State to handle errors
   const [selectedProduct, setSelectedProduct] = useState(null); // Store the selected product object
 
+  // Fetch products with pagination based on the selected category
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       setError(null); // Reset error state
       try {
-        const response = await axios.get('https://eccom-backend.onrender.com/products', {
-          params: {
-            page: currentPage,
-            limit: 10
-          }
-        });
+        // If a category is selected, fetch products by category, otherwise fetch all
+        const response = selectedCategory === 'All'
+          ? await axios.get('https://eccom-backend.onrender.com/products', {
+              params: {
+                page: currentPage,
+                limit: 10,
+              }
+            })
+          : await axios.get(`https://eccom-backend.onrender.com/products/category/${selectedCategory}`, {
+              params: {
+                page: currentPage,
+                limit: 10,
+              }
+            });
+
         setProducts(response.data.products);
-        setFilteredProducts(response.data.products);
-        setTotalPages(response.data.totalPages);
+        setFilteredProducts(response.data.products);  // Ensure filtered products are updated
+        setTotalPages(response.data.totalPages);  // Update the total pages for pagination
       } catch (error) {
         console.error('Error fetching products:', error);
-        setError('Failed to load products. Please try again later.'); // Set error message
+        setError('Failed to load products. Please try again later.');  // Set error message
       }
       setLoading(false);
     };
 
     fetchProducts();
-  }, [currentPage]);
+  }, [currentPage, selectedCategory]);  // Re-fetch when currentPage or selectedCategory changes
 
   useEffect(() => {
     let updatedProducts = [...products];
 
+    // Filter by search term if provided
     if (searchTerm) {
       updatedProducts = updatedProducts.filter(product =>
         product.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    if (selectedCategory !== 'All') {
-      updatedProducts = updatedProducts.filter(product => product.category === selectedCategory);
-    }
-
     setFilteredProducts(updatedProducts);
-  }, [searchTerm, selectedCategory, products]);
+  }, [searchTerm, products]);  // Filter only when search term or products change
 
   // Handle click on product and open modal with product details
   const handleProductClick = (product) => {
@@ -67,11 +74,17 @@ function HomePage() {
     setSelectedProduct(null);  // Close modal
   };
 
+  // Handle category change and reset pagination
+  const handleCategoryChange = (category) => {
+    setSelectedCategory(category);
+    setCurrentPage(1);  // Reset to the first page when category changes
+  };
+
   return (
     <div className="container">
       <h1 className="page-title">Ecommerce Landing Page</h1>
       <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      <CategoryFilter selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+      <CategoryFilter selectedCategory={selectedCategory} setSelectedCategory={handleCategoryChange} />
 
       {loading ? ( 
         <Spinner /> 
