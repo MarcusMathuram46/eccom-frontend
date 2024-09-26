@@ -22,7 +22,7 @@ function HomePage() {
     const fetchProducts = async () => {
       setLoading(true); // Start loading
       try {
-        const response = await axios.get('http://localhost:5000/products', {
+        const response = await axios.get('https://eccom-backend.onrender.com/products', {
           params: {
             page: currentPage,
             limit: 10  // Adjust the limit based on your requirement
